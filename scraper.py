@@ -7,39 +7,37 @@ import csv
 with open('agents.txt') as f:
     lines = f.readlines()
 
-	
-mys = "/scripts/mgrqispi.dll?APPNAME=IMS&PRGNAME=IMSListingAgentDetail"
-myn = "<td valign=\"top\"><a href=\"mailto:"
-new = []
-emailsT = []
+agentURL = "/scripts/mgrqispi.dll?APPNAME=IMS&PRGNAME=IMSListingAgentDetail"
+mailToString = "<td valign=\"top\"><a href=\"mailto:"
+agentURLS = []
 emails = []
+emailsFormatted = []
+
+
 for line in lines:
-	if mys in line:
-		murl = re.findall(r'"([^"]*)"', line)
-		str1 = ''.join(murl)
-		nurl = "https://members.gallatinrealtors.com" + str1
-		new.append(nurl)
+	if agentURL in line:
+		mURL = re.findall(r'"([^"]*)"', line)
+		strURL = ''.join(mURL)
+		fullURL = "https://members.gallatinrealtors.com" + str1
+		agentURLS.append(fullURL)
 		
 
-for page in new:
-	page = requests.get(page)
+for url in agentURLS:
+	page = requests.get(url)
 	for line in page.iter_lines():
-		if line:
-			if b'\t\t<td valign="top"><a href="mailto:' in line:
-				print(line.decode("utf-8"))
-				emailsT.append(line.decode("utf-8"))
+		if b'\t\t<td valign="top"><a href="mailto:' in line:
+			print(line.decode("utf-8"))
+			emails.append(line.decode("utf-8"))
 	
+	
+for line in emails:
+	mailto = re.findall(r'"([^"]*)"', line)
+	mailto.pop(0)
+	mailtoStr = ''.join(mailto)
+	email = str2[7:]
+	emailsFormatted.append(email)
 
 	
-	
-for line in emailsT:
-	tmp = re.findall(r'"([^"]*)"', line)
-	tmp.pop(0)
-	str2 = ''.join(tmp)
-	st3 = str2[7:]
-	emails.append(st3)
-
-	
-with open('output.csv', 'w') as myfile:
-	wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-	wr.writerow(emails)
+with open('output.csv', 'w') as out:
+	wr = csv.writer(out, quoting=csv.QUOTE_ALL)
+	wr.writerow(emailsFormatted)
